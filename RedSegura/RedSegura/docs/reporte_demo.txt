@@ -1,0 +1,232 @@
+REPORTE REDSEGURA
+Proyecto: movilidad entre universidades, salud, transporte y puntos de encuentro de Sincelejo
+Aviso: los tiempos son datos didácticos de simulación; no son información oficial de
+tránsito ni de respuesta a emergencias.
+
+RedSegura - demostración (tiempos didácticos de simulación; no son datos oficiales
+de tránsito ni de respuesta a emergencias)
+
+==============================================================================
+Q1 - Buscar "Hospital Universitario" en el ABB y en el AVL
+==============================================================================
+
+Inserción en orden del dataset (S01..S12) - 12 claves
+  ABB: encontrado     pasos =  3   altura = 7
+  AVL: encontrado     pasos =  1   altura = 4
+  -> El AVL necesitó 2 paso(s) menos.
+
+Inserción en orden alfabético ascendente (peor caso del ABB) - 12 claves
+  ABB: encontrado     pasos =  5   altura = 12
+  AVL: encontrado     pasos =  4   altura = 4
+  -> El AVL necesitó 1 paso(s) menos.
+
+Lectura: la forma del ABB depende del orden de llegada de las claves (su altura va de
+~log n hasta n; con entrada ordenada degenera en una lista y buscar cuesta O(n)).
+El AVL se reequilibra con rotaciones y conserva altura O(log n) sin importar el orden.
+
+==============================================================================
+Q2 - Las cuatro rotaciones del AVL
+==============================================================================
+
+Caso LL: se insertan [30, 20, 10]
+  Rotaciones aplicadas: [LL]
+  Preorden resultante : [20, 10, 30]   (altura = 2)
+  Árbol (raíz a la izquierda, derecho arriba):
+        30
+    20
+        10
+
+Caso RR: se insertan [10, 20, 30]
+  Rotaciones aplicadas: [RR]
+  Preorden resultante : [20, 10, 30]   (altura = 2)
+  Árbol (raíz a la izquierda, derecho arriba):
+        30
+    20
+        10
+
+Caso LR: se insertan [30, 10, 20]
+  Rotaciones aplicadas: [LR]
+  Preorden resultante : [20, 10, 30]   (altura = 2)
+  Árbol (raíz a la izquierda, derecho arriba):
+        30
+    20
+        10
+
+Caso RL: se insertan [10, 30, 20]
+  Rotaciones aplicadas: [RL]
+  Preorden resultante : [20, 10, 30]   (altura = 2)
+  Árbol (raíz a la izquierda, derecho arriba):
+        30
+    20
+        10
+
+LL y RR son rotaciones simples; LR y RL son dobles (rotación del hijo y luego de la raíz).
+En los cuatro casos queda la clave del medio como raíz, con altura 2.
+
+==============================================================================
+Q3 - Representaciones del grafo
+==============================================================================
+Lista de adyacencia (solo salidas válidas según orientación):
+S01 UAJS Sede C              -> S07(4 min, R01) | S09(5 min, R03) | S02(8 min, R04)
+S02 UAJS Sede E              -> S01(8 min, R04) | S06(10 min, R05)
+S03 Universidad de Sucre     -> S12(4 min, R11)
+S04 CECAR                    -> S11(6 min, R13)
+S05 Hospital Universitario   -> S09(6 min, R07)
+S06 Clínica Las Américas     -> S05(4 min, R06)
+S07 Estación Central SETP    -> S01(6 min, R02) | S09(3 min, R15) | S08(12 min, R16)
+S08 Terminal de Transporte   -> S10(9 min, R10)
+S09 Parque Santander         -> S01(5 min, R03) | S05(6 min, R07) | S10(3 min, R08) | S12(7 min, R12) | S07(3 min, R15) | S03(7 min, R17)
+S10 Mercado de Sincelejo     -> S09(3 min, R08) | S08(8 min, R09)
+S11 PEP Argelia              -> S04(6 min, R13) | S07(8 min, R14)
+S12 Glorieta Sincelejito     -> S03(4 min, R11) | S09(7 min, R12) | S04(9 min, R18)
+
+Matriz de adyacencia ponderada:
+       S01  S02  S03  S04  S05  S06  S07  S08  S09  S10  S11  S12
+S01      .    8    .    .    .    .    4    .    5    .    .    .
+S02      8    .    .    .    .   10    .    .    .    .    .    .
+S03      .    .    .    .    .    .    .    .    .    .    .    4
+S04      .    .    .    .    .    .    .    .    .    .    6    .
+S05      .    .    .    .    .    .    .    .    6    .    .    .
+S06      .    .    .    .    4    .    .    .    .    .    .    .
+S07      6    .    .    .    .    .    .   12    3    .    .    .
+S08      .    .    .    .    .    .    .    .    .    9    .    .
+S09      5    .    7    .    6    .    3    .    .    3    .    7
+S10      .    .    .    .    .    .    .    8    3    .    .    .
+S11      .    .    .    6    .    .    8    .    .    .    .    .
+S12      .    .    4    9    .    .    .    .    7    .    .    .
+(. = sin conexión; valores en minutos; fila = origen, columna = destino)
+
+Matriz de incidencia:
+       R01  R02  R03  R04  R05  R06  R07  R08  R09  R10  R11  R12  R13  R14  R15  R16  R17  R18
+S01     +1   -1   +1   +1    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+S02      0    0    0   +1   +1    0    0    0    0    0    0    0    0    0    0    0    0    0
+S03      0    0    0    0    0    0    0    0    0    0   +1    0    0    0    0    0   -1    0
+S04      0    0    0    0    0    0    0    0    0    0    0    0   +1    0    0    0    0   -1
+S05      0    0    0    0    0   -1   +1    0    0    0    0    0    0    0    0    0    0    0
+S06      0    0    0    0   -1   +1    0    0    0    0    0    0    0    0    0    0    0    0
+S07     -1   +1    0    0    0    0    0    0    0    0    0    0    0   -1   +1   +1    0    0
+S08      0    0    0    0    0    0    0    0   -1   +1    0    0    0    0    0   -1    0    0
+S09      0    0   +1    0    0    0   +1   +1    0    0    0   +1    0    0   +1    0   +1    0
+S10      0    0    0    0    0    0    0   +1   +1   -1    0    0    0    0    0    0    0    0
+S11      0    0    0    0    0    0    0    0    0    0    0    0   +1   +1    0    0    0    0
+S12      0    0    0    0    0    0    0    0    0    0   +1   +1    0    0    0    0    0   +1
+(+1 origen o extremo de arista no dirigida; -1 destino de arco dirigido; 0 sin incidencia)
+
+==============================================================================
+Q4 - BFS y DFS desde S02 (UAJS Sede E)
+==============================================================================
+BFS (cola, por niveles):
+  Orden : [S02, S01, S06, S07, S09, S05, S08, S10, S12, S03, S04, S11]
+  Niveles:
+    nivel 0: [S02]
+    nivel 1: [S01, S06]
+    nivel 2: [S07, S09, S05]
+    nivel 3: [S08, S10, S12, S03]
+    nivel 4: [S04]
+    nivel 5: [S11]
+  Árbol BFS (hijo <- padre): {S01=S02, S06=S02, S07=S01, S09=S01, S05=S06, S08=S07, S10=S09, S12=S09, S03=S09, S04=S12, S11=S04}
+DFS recursivo:
+  Orden : [S02, S01, S07, S09, S05, S10, S08, S12, S03, S04, S11, S06]
+  Árbol DFS (hijo <- padre): {S01=S02, S07=S01, S09=S07, S05=S09, S10=S09, S08=S10, S12=S09, S03=S12, S04=S12, S11=S04, S06=S02}
+DFS iterativo (pila): [S02, S01, S07, S09, S05, S10, S08, S12, S03, S04, S11, S06]  (igual al recursivo)
+
+Los órdenes empiezan a diferir en la posición 3: BFS visita S06 y DFS visita S07.
+Por qué pueden diferir: BFS usa una cola FIFO y agota todos los vecinos de un nivel antes de
+bajar; DFS se hunde por el primer vecino hasta quedarse sin salidas y entonces retrocede.
+Además, el orden entre hermanos depende del orden en que se registraron las conexiones, y
+los arcos dirigidos limitan qué vértices se alcanzan desde el origen.
+
+==============================================================================
+Q5 - Dijkstra de S02 a S08
+==============================================================================
+  S02 -[R04, 8]-> S01 -[R01, 4]-> S07 -[R16, 12]-> S08
+  UAJS Sede E > UAJS Sede C > Estación Central SETP > Terminal de Transporte
+  Total: 24 minutos
+Resultado de control (24 min por S02, S01, S07, S08): CUMPLE
+Nota: S08 también se alcanza con 24 min por S02, S01, S09, S10, S08 (empate). Dijkstra
+conserva la primera ruta encontrada porque solo relaja con distancia estrictamente menor.
+
+Distancias mínimas desde S02 y predecesores:
+  ID   Lugar                       Minutos  Predecesor (conexión)
+  S01  UAJS Sede C                       8  S02 (R04)
+  S02  UAJS Sede E                       0  -
+  S03  Universidad de Sucre             20  S09 (R17)
+  S04  CECAR                            29  S12 (R18)
+  S05  Hospital Universitario           14  S06 (R06)
+  S06  Clínica Las Américas             10  S02 (R05)
+  S07  Estación Central SETP            12  S01 (R01)
+  S08  Terminal de Transporte           24  S07 (R16)
+  S09  Parque Santander                 13  S01 (R03)
+  S10  Mercado de Sincelejo             16  S09 (R08)
+  S11  PEP Argelia                      35  S04 (R13)
+  S12  Glorieta Sincelejito             20  S09 (R12)
+
+==============================================================================
+Q6 - Bloquear R16 y recalcular S02 -> S08
+==============================================================================
+Antes del bloqueo:
+  S02 -[R04, 8]-> S01 -[R01, 4]-> S07 -[R16, 12]-> S08
+  UAJS Sede E > UAJS Sede C > Estación Central SETP > Terminal de Transporte
+  Total: 24 minutos
+Después de bloquear R16:
+  S02 -[R04, 8]-> S01 -[R03, 5]-> S09 -[R08, 3]-> S10 -[R09, 8]-> S08
+  UAJS Sede E > UAJS Sede C > Parque Santander > Mercado de Sincelejo > Terminal de Transporte
+  Total: 24 minutos
+Explicación:
+  La ruta original usaba R16. Al bloquearla Dijkstra tomó otra ruta con el
+  mismo costo (24 min): había un empate y antes se había conservado la
+  primera encontrada. Cambia el camino, no el tiempo.
+
+Escenario adicional: se bloquean también las demás entradas a S08: R09
+  No existe ruta de S02 a S08.
+  Grafo desconectado hacia el destino: Dijkstra informa que no hay ruta, sin fallar.
+
+Estado restaurado: las conexiones vuelven a estar disponibles.
+
+==============================================================================
+Q7 - Consultar un vértice inexistente (S99)
+==============================================================================
+Consultar lugar S99:
+  Error controlado: El vértice S99 no existe en el grafo.
+BFS desde S99:
+  Error controlado: El vértice S99 no existe en el grafo.
+Dijkstra de S02 a S99:
+  Error controlado: El vértice S99 no existe en el grafo.
+El programa continúa con normalidad.
+
+==============================================================================
+Extra - Estructura del grafo (DFS)
+==============================================================================
+Lugares: 12   Conexiones: 18
+¿Tiene ciclos? sí
+Componentes débilmente conexas: 1
+  #1: [S01, S07, S11, S04, S12, S03, S09, S05, S06, S02, S10, S08]
+
+ANÁLISIS DE COMPLEJIDAD (n = claves, V = vértices, E = conexiones, h = altura)
+--------------------------------------------------------------------------------
+Componente / operación                    Tiempo                 Espacio extra
+ABB insert / search / delete              O(h): O(log n) prom.,   O(1) iterativo
+                                          O(n) peor caso          (delete: O(h) pila)
+ABB recorridos (in/pre/post)              O(n)                    O(h) pila + O(n) lista
+AVL insert / search / delete              O(log n) peor caso      O(log n) pila
+AVL rotaciones LL/RR/LR/RL                O(1) cada una           O(1)
+AVL recorridos                            O(n)                    O(log n) pila + O(n)
+Grafo addVertex / addEdge                 O(1) amortizado         O(1)
+Grafo neighbors(v)                        O(d(v))                 O(d(v))
+Lista de adyacencia                       O(V + E)                O(V + E)
+Matriz de adyacencia                      O(V² + E)               O(V²)
+Matriz de incidencia                      O(V·E)                  O(V·E)
+BFS (cola + visitados)                    O(V + E)                O(V)
+DFS recursivo / iterativo                 O(V + E)                O(V) (pila)
+Detección de ciclos                       O(V + E)                O(V)
+Componentes débiles                       O(V + E)                O(V)
+Dijkstra con PriorityQueue                O((V + E) log V)        O(V + E)
+Reconstrucción del camino                 O(V)                    O(V)
+
+Notas:
+- El ABB se degrada a O(n) con inserciones ordenadas; el AVL garantiza altura
+  <= 1.44 log2(n + 2), por eso mantiene O(log n) siempre (ver Q1).
+- Con V = 12 y E = 18 las diferencias son pequeñas; el análisis aplica al crecer el mapa.
+- Dijkstra usa eliminación perezosa de entradas obsoletas, por lo que la cola puede
+  tener hasta O(E) entradas; log E = O(log V) porque E <= V².
+
